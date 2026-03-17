@@ -65,4 +65,23 @@ def print_confusion_matrix(predictions, true_labels):
 predictions = nearest_neighbor(testImages, testLabels, trainImages, trainLabels)
 print_confusion_matrix(predictions, testLabels)
 
+#printing some correct and incorrect predictions
+wrong_indices = np.where(predictions != testLabels)[0]
+right_indices = np.where(predictions == testLabels)[0]
 
+fig, axes = plt.subplots(2, 5, figsize=(12, 5))
+
+for i in range(5):
+    idx = wrong_indices[i]
+    axes[0, i].imshow(make_image(testImages[idx]), cmap="gray")
+    axes[0, i].set_title(f"T={testLabels[idx]}, P={predictions[idx]}")
+    axes[0, i].axis("off")
+
+for i in range(5):
+    idx = right_indices[i]
+    axes[1, i].imshow(make_image(testImages[idx]), cmap="gray")
+    axes[1, i].set_title(f"T={testLabels[idx]}, P={predictions[idx]}")
+    axes[1, i].axis("off")
+
+plt.tight_layout()
+plt.show()
