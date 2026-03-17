@@ -4,7 +4,7 @@ import scipy as sp
 from scipy.spatial.distance import cdist
 
 
-def load_mnist(images_path, labels_path):
+""" def load_mnist(images_path, labels_path):
     images = np.fromfile(images_path, dtype=np.uint8)[16:].reshape(-1, 28*28)
     labels = np.fromfile(labels_path, dtype=np.uint8)[8:]
     return images, labels
@@ -13,7 +13,7 @@ testImages, testLabels = load_mnist("numbersdata/test_images.bin", "numbersdata/
 trainImages, trainLabels = load_mnist("numbersdata/train_images.bin", "numbersdata/train_labels.bin")
 
 trainImages = trainImages.astype(np.float32)
-testImages = testImages.astype(np.float32)
+testImages = testImages.astype(np.float32) """
 
 #print("Test Images Shape:", testImages.shape)
 
@@ -53,7 +53,7 @@ def nearest_neighbor(test_images,test_labels, train_images, train_labels):
     accuracy = np.mean(predictions == test_labels)
     print(f"Accuracy: {accuracy:.2%}")
     print(f"Error rate: {100 - accuracy * 100:.2f}%")
-    return predictions
+    return predictions, accuracy
 
 def print_confusion_matrix(predictions, true_labels):
     confusion_matrix = np.zeros((10, 10), dtype=int)
@@ -61,27 +61,34 @@ def print_confusion_matrix(predictions, true_labels):
         confusion_matrix[true][pred] += 1
     print(confusion_matrix)
 
+def confusion_matrix(predictions, true_labels):
+    confusion_matrix = np.zeros((10, 10), dtype=int)
+    for pred, true in zip(predictions, true_labels):
+        confusion_matrix[true][pred] += 1
+    return confusion_matrix
 #test_nearest_neighbor(testImages, testLabels, trainImages, trainLabels)
-predictions = nearest_neighbor(testImages, testLabels, trainImages, trainLabels)
-print_confusion_matrix(predictions, testLabels)
+def run_task_2_1(testImages, testLabels, trainImages, trainLabels):
+    predictions, accuracy = nearest_neighbor(testImages, testLabels, trainImages, trainLabels)
+    print_confusion_matrix(predictions, testLabels)
 
-#printing some correct and incorrect predictions
-wrong_indices = np.where(predictions != testLabels)[0]
-right_indices = np.where(predictions == testLabels)[0]
+    #printing some correct and incorrect predictions
+    wrong_indices = np.where(predictions != testLabels)[0]
+    right_indices = np.where(predictions == testLabels)[0]
 
-fig, axes = plt.subplots(2, 5, figsize=(12, 5))
+    fig, axes = plt.subplots(2, 5, figsize=(12, 5))
 
-for i in range(5):
-    idx = wrong_indices[i]
-    axes[0, i].imshow(make_image(testImages[idx]), cmap="gray")
-    axes[0, i].set_title(f"T={testLabels[idx]}, P={predictions[idx]}")
-    axes[0, i].axis("off")
+    for i in range(5):
+        idx = wrong_indices[i]
+        axes[0, i].imshow(make_image(testImages[idx]), cmap="gray")
+        axes[0, i].set_title(f"T={testLabels[idx]}, P={predictions[idx]}")
+        axes[0, i].axis("off")
 
-for i in range(5):
-    idx = right_indices[i]
-    axes[1, i].imshow(make_image(testImages[idx]), cmap="gray")
-    axes[1, i].set_title(f"T={testLabels[idx]}, P={predictions[idx]}")
-    axes[1, i].axis("off")
+    for i in range(5):
+        idx = right_indices[i]
+        axes[1, i].imshow(make_image(testImages[idx]), cmap="gray")
+        axes[1, i].set_title(f"T={testLabels[idx]}, P={predictions[idx]}")
+        axes[1, i].axis("off")
 
-plt.tight_layout()
-plt.show()
+    plt.savefig("rightandwrongnumbers.png", dpi=300)
+    plt.close()
+    return accuracy, confusion_matrix(predictions, testLabels)

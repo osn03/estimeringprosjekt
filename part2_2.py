@@ -3,7 +3,7 @@ from sklearn.cluster import KMeans
 from sklearn.metrics import confusion_matrix
 from scipy.spatial.distance import cdist
 
-def load_mnist(images_path, labels_path):
+""" def load_mnist(images_path, labels_path):
     images = np.fromfile(images_path, dtype=np.uint8)[16:].reshape(-1, 28*28)
     labels = np.fromfile(labels_path, dtype=np.uint8)[8:]
     return images, labels
@@ -14,7 +14,7 @@ trainImages, trainLabels = load_mnist("numbersdata/train_images.bin", "numbersda
 trainImages = trainImages.astype(np.float32)
 testImages = testImages.astype(np.float32)
 
-M = 64
+M = 64 """
 
 def train_kmeans(train_images, n_clusters):
     kmeans = KMeans(n_clusters=n_clusters, random_state=42)
@@ -36,21 +36,23 @@ def nearest_neighbor(test_images,test_labels, all_centers, center_labels):
     accuracy = np.mean(predictions == test_labels)
     print(f"Accuracy: {accuracy:.2%}")
     print(f"Error rate: {(1 - accuracy):.2%}")
-    return predictions
+    return predictions, accuracy
 
-centers = []
-center_labels = []
+def run_task_2_2(testImages, testLabels, trainImages, trainLabels, M):
+    centers = []
+    center_labels = []
 
-for i in range(10):
-    print("Training KMeans for digit", i)
-    digit_images = trainImages[trainLabels == i]
-    centers.append(train_kmeans(digit_images, M))
-    center_labels.append(np.full(M, i))
+    for i in range(10):
+        print("Training KMeans for digit", i)
+        digit_images = trainImages[trainLabels == i]
+        centers.append(train_kmeans(digit_images, M))
+        center_labels.append(np.full(M, i))
 
-centers = np.vstack(centers)
-center_labels = np.hstack(center_labels)
+    centers = np.vstack(centers)
+    center_labels = np.hstack(center_labels)
 
-predictions = nearest_neighbor(testImages, testLabels, centers, center_labels)   
+    predictions, accuracy = nearest_neighbor(testImages, testLabels, centers, center_labels)   
 
-print(confusion_matrix(testLabels, predictions))
+    print(confusion_matrix(testLabels, predictions))
+    return accuracy, confusion_matrix(testLabels, predictions)
 
