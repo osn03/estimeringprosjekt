@@ -1,6 +1,4 @@
-import numpy as np 
-from sklearn.cluster import KMeans
-from sklearn.metrics import confusion_matrix
+import numpy as np
 from scipy.spatial.distance import cdist
 
 def load_mnist(images_path, labels_path):
@@ -14,43 +12,30 @@ trainImages, trainLabels = load_mnist("numbersdata/train_images.bin", "numbersda
 trainImages = trainImages.astype(np.float32)
 testImages = testImages.astype(np.float32)
 
-M = 64
+def print_confusion_matrix(predictions, true_labels):
+    confusion_matrix = np.zeros((10, 10), dtype=int)
+    for pred, true in zip(predictions, true_labels):
+        confusion_matrix[true][pred] += 1
+    print(confusion_matrix)
 
-def train_kmeans(train_images, n_clusters):
-    kmeans = KMeans(n_clusters=n_clusters, random_state=42)
-    kmeans.fit(train_images)
-    Ci = kmeans.cluster_centers_
-    return Ci
+K = 7
 
-def nearest_neighbor(test_images,test_labels, all_centers, center_labels):
+def k_nearest_neighbors(test_images, test_labels, train_images, train_labels, k):
     batch_size = 500
     predictions = np.empty(len(test_images), dtype=np.uint8)
 
     for start in range(0, len(test_images), batch_size):
         end = min(start + batch_size, len(test_images))
         batch = test_images[start:end]
-        distances = cdist(batch, all_centers, metric='sqeuclidean')
-        nearest_indices = np.argmin(distances, axis=1)
-        predictions[start:end] = center_labels[nearest_indices]
+        distances = cdist(batch, train_images, metric='sqeuclidean')
+
+        nearest_indices = np.argpartition(distances, k, axis=1)[:, :k]
+        nearest_labels = train_labels[nearest_indices]
+        predictions[start:end] = np.array([np.bincount(labels).argmax() for labels in nearest_labels])
         print(f"Processed {end} / {len(test_images)} images")
     accuracy = np.mean(predictions == test_labels)
     print(f"Accuracy: {accuracy:.2%}")
     print(f"Error rate: {(1 - accuracy):.2%}")
     return predictions
-
-centers = []
-center_labels = []
-
-for i in range(10):
-    print("Training KMeans for digit", i)
-    digit_images = trainImages[trainLabels == i]
-    centers.append(train_kmeans(digit_images, M))
-    center_labels.append(np.full(M, i))
-
-centers = np.vstack(centers)
-center_labels = np.hstack(center_labels)
-
-predictions = nearest_neighbor(testImages, testLabels, centers, center_labels)   
-
-print(confusion_matrix(testLabels, predictions))
-
+predictions = k_nearest_neighbors(testImages, testLabels, trainImages, trainLabels, K)
+print_confusion_matrix(predictions, testLabels)
