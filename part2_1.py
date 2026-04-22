@@ -4,20 +4,6 @@ import scipy as sp
 from scipy.spatial.distance import cdist
 
 
-""" def load_mnist(images_path, labels_path):
-    images = np.fromfile(images_path, dtype=np.uint8)[16:].reshape(-1, 28*28)
-    labels = np.fromfile(labels_path, dtype=np.uint8)[8:]
-    return images, labels
-
-testImages, testLabels = load_mnist("numbersdata/test_images.bin", "numbersdata/test_labels.bin")
-trainImages, trainLabels = load_mnist("numbersdata/train_images.bin", "numbersdata/train_labels.bin")
-
-trainImages = trainImages.astype(np.float32)
-testImages = testImages.astype(np.float32) """
-
-#print("Test Images Shape:", testImages.shape)
-
-#Euclidean distance function
 
 def make_image(image_vector):
     return image_vector.reshape(28, 28)
