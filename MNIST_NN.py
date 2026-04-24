@@ -52,10 +52,36 @@ def confusion_matrix(predictions, true_labels):
     for pred, true in zip(predictions, true_labels):
         confusion_matrix[true][pred] += 1
     return confusion_matrix
-#test_nearest_neighbor(testImages, testLabels, trainImages, trainLabels)
+
+#plot function with by chatGPT
+def plot_confusion_matrix(cm, save_path="confusion_matrixnn.png"):
+    fig, ax = plt.subplots(figsize=(8, 6))
+    
+    im = ax.imshow(cm)
+    plt.colorbar(im)
+
+    ax.set_xlabel("Predicted label")
+    ax.set_ylabel("True label")
+    ax.set_title("Confusion Matrix NN")
+
+    ax.set_xticks(np.arange(10))
+    ax.set_yticks(np.arange(10))
+
+    # Add numbers inside cells
+    for i in range(cm.shape[0]):
+        for j in range(cm.shape[1]):
+            ax.text(j, i, cm[i, j],
+                    ha="center", va="center", fontsize=8)
+
+    plt.tight_layout()
+    plt.savefig(save_path, dpi=300)
+    plt.close()
+
+
 def run_task_2_1(testImages, testLabels, trainImages, trainLabels):
     predictions, accuracy = nearest_neighbor(testImages, testLabels, trainImages, trainLabels)
-    print_confusion_matrix(predictions, testLabels)
+    cm = confusion_matrix(predictions, testLabels)
+    plot_confusion_matrix(cm)
 
     #printing some correct and incorrect predictions
     wrong_indices = np.where(predictions != testLabels)[0]
@@ -78,3 +104,6 @@ def run_task_2_1(testImages, testLabels, trainImages, trainLabels):
     plt.savefig("rightandwrongnumbers.png", dpi=300)
     plt.close()
     return accuracy, confusion_matrix(predictions, testLabels)
+
+
+

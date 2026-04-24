@@ -1,6 +1,6 @@
-import KNN
-import part2_1
-import part2_2
+import MNIST_clustering
+import MNIST_KNN
+import MNIST_NN
 import numpy as np
 import time
 
@@ -18,15 +18,15 @@ M = 64
 K = 7
 
 start = time.perf_counter()
-accuracy_2_1, confusion_matrix_2_1 = part2_1.run_task_2_1(testImages, testLabels, trainImages, trainLabels)
+accuracy_2_1, confusion_matrix_2_1 = MNIST_NN.run_task_2_1(testImages, testLabels, trainImages, trainLabels)
 time_2_1 = time.perf_counter() - start
 
 start = time.perf_counter()
-accuracy_2_2, confusion_matrix_2_2 = part2_2.run_task_2_2(testImages, testLabels, trainImages, trainLabels, M)
+accuracy_2_2, confusion_matrix_2_2 = MNIST_clustering.run_task_2_2(testImages, testLabels, trainImages, trainLabels, M)
 time_2_2 = time.perf_counter() - start
 
 start = time.perf_counter()
-accuracy_KNN, confusion_matrix_KNN = KNN.run_KNN(testImages, testLabels, trainImages, trainLabels, K)
+accuracy_KNN, confusion_matrix_KNN = MNIST_KNN.run_KNN(testImages, testLabels, trainImages, trainLabels, K)
 time_KNN = time.perf_counter() - start
 
 print(f"Task 2.1 (Nearest Neighbor) Accuracy: {accuracy_2_1:.2%}\t Time: {time_2_1:.2f} seconds")
